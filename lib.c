@@ -73,6 +73,9 @@ void delete(int id){
         }
         temp=temp->next;
     }
+    if(temp==NULL){
+        printf("error:ID NOT FOUND\n");
+    }
 }
 void print(){
     node* temp=head;
@@ -84,8 +87,8 @@ void print(){
 
 void process_line(char *line){
     line[strcspn(line,"\n")]='\0';
-    char* token=strtok(line," ");
-    if(strcmp(token,"INSERT")==0){
+    if(strstr(line,"INSERT")!=NULL){
+        char* token=strtok(line," ");
         token=strtok(NULL," ");
         int id=atoi(token);
         token=strtok(NULL," ");
@@ -96,17 +99,26 @@ void process_line(char *line){
         token=strtok(NULL," ");
         insertend(name,marks,id,token);
     }
-    if(strcmp(token,"DELETE")==0){
+    if(strstr(line,"DELETE")!=NULL){
+        char* token=strtok(line," ");
         token=strtok(NULL," ");
         int id=atoi(token);
         delete(id);
     }
-    if(strcmp(token,"UPDATE")==0){
+    if(strstr(line,"UPDATE")!=NULL){
+        char* token=strtok(line," ");
         token=strtok(NULL," ");
         int id=atoi(token);
         node* temp=head;
-        while(temp->id!=id){
+        while(temp!=NULL){
+            if(temp->id==id){
+                break;
+            }
             temp=temp->next;
+        }
+        if(temp==NULL){
+            printf("error:ID NOT FOUND\n");
+            return;
         }
         token=strtok(NULL," ");
         char op[10];
@@ -123,6 +135,103 @@ void process_line(char *line){
         if(strcmp(op,"CITY")==0){
             token=strtok(NULL," ");
             strcpy(temp->city,token);
+        }
+    }
+    if(strstr(line,"SELECT")!=NULL){
+        char* token=strtok(line," ");
+        token=strtok(NULL," ");
+        if(strcmp(token,"*")==0){
+            token=strtok(NULL," ");
+            if(token==NULL){
+                print();
+            }
+            if(strcmp(token,"WHERE")==0){
+               token=strtok(NULL," ");
+               if(strcmp(token,"id")==0){
+                token=strtok(NULL," ");
+                if(strcmp(token,"=")==0){
+                    token=strtok(NULL," ");
+                    int sid=atoi(token);
+                    node* temp=head;
+                    while(temp!=NULL){
+                      if(temp->id==sid){
+                        printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
+                        break;
+                      }
+                      temp=temp->next; 
+                    }
+                }
+                if(strcmp(token,">")==0){
+                    token=strtok(NULL," ");
+                    int sid=atoi(token);
+                    node* temp=head;
+                    while(temp!=NULL){
+                        if(temp->id>sid){
+                            printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
+                        }
+                        temp=temp->next;
+                    }
+                }
+                if(strcmp(token,"<")==0){
+                    token=strtok(NULL," ");
+                    int sid=atoi(token);
+                    node* temp=head;
+                    while(temp!=NULL){
+                        if(temp->id<sid){
+                            printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
+                        }
+                        temp=temp->next;
+                    }
+                }  
+            }
+            if(strcmp(token,"name")==0){
+                token=strtok(NULL," ");
+                token=strtok(NULL," ");
+                node* temp=head;
+                while(temp!=NULL){
+                    if(strcmp(temp->name,token)==0){
+                        printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
+                    }
+                    temp=temp->next;
+                }
+            }
+            if(strcmp(token,"marks")==0){
+                token=strtok(NULL," ");
+                if(strcmp(token,">")==0){
+                    token=strtok(NULL," ");
+                    int m=atoi(token);
+                    node* temp=head;
+                    while(temp!=NULL){
+                        if(temp->id>m){
+                            printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
+                        }
+                        temp=temp->next;
+                    }
+                }
+                if(strcmp(token,"<")==0){
+                    token=strtok(NULL," ");
+                    int m=atoi(token);
+                    node* temp=head;
+                    while(temp!=NULL){
+                        if(temp->id<m){
+                            printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
+                        }
+                        temp=temp->next;
+                    }
+                }
+                if(strcmp(token,"=")==0){
+                    token=strtok(NULL," ");
+                    int m=atoi(token);
+                    node* temp=head;
+                    while(temp!=NULL){
+                        if(temp->id==m){
+                            printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
+                        }
+                        temp=temp->next;
+                    }
+                }                                
+            }
+            }
         }
     }
 }
