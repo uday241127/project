@@ -55,7 +55,7 @@ void deletend(){
     }
     free(temp);
 }
-void delete(int id){
+void delete(int id,int f){
     if(head->id==id){
         deletebeg();
         return;
@@ -73,20 +73,21 @@ void delete(int id){
         }
         temp=temp->next;
     }
-    if(temp==NULL){
+    if(f){
         printf("error:ID NOT FOUND\n");
     }
 }
 void print(){
     node* temp=head;
     while(temp!=NULL){
-        printf("%d %s %d\n",temp->id,temp->name,temp->marks);
+        printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
         temp=temp->next;
     }
 }
 
 void process_line(char *line){
     line[strcspn(line,"\n")]='\0';
+    int f=1;
     if(strstr(line,"INSERT")!=NULL){
         char* token=strtok(line," ");
         token=strtok(NULL," ");
@@ -103,7 +104,7 @@ void process_line(char *line){
         char* token=strtok(line," ");
         token=strtok(NULL," ");
         int id=atoi(token);
-        delete(id);
+        delete(id,f);
     }
     if(strstr(line,"UPDATE")!=NULL){
         char* token=strtok(line," ");
@@ -112,11 +113,12 @@ void process_line(char *line){
         node* temp=head;
         while(temp!=NULL){
             if(temp->id==id){
+                f=0;
                 break;
             }
             temp=temp->next;
         }
-        if(temp==NULL){
+        if(f){
             printf("error:ID NOT FOUND\n");
             return;
         }
@@ -140,10 +142,12 @@ void process_line(char *line){
     if(strstr(line,"SELECT")!=NULL){
         char* token=strtok(line," ");
         token=strtok(NULL," ");
+        
         if(strcmp(token,"*")==0){
             token=strtok(NULL," ");
             if(token==NULL){
                 print();
+                return;
             }
             if(strcmp(token,"WHERE")==0){
                token=strtok(NULL," ");
@@ -156,9 +160,13 @@ void process_line(char *line){
                     while(temp!=NULL){
                       if(temp->id==sid){
                         printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
+                        f=0;
                         break;
                       }
                       temp=temp->next; 
+                    }
+                    if(f){
+                        printf("error:ID NOT FOUND\n");
                     }
                 }
                 if(strcmp(token,">")==0){
@@ -168,8 +176,12 @@ void process_line(char *line){
                     while(temp!=NULL){
                         if(temp->id>sid){
                             printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
+                            f=0;
                         }
                         temp=temp->next;
+                    }   
+                    if(f){
+                        printf("error:ID NOT FOUND\n");
                     }
                 }
                 if(strcmp(token,"<")==0){
@@ -179,8 +191,12 @@ void process_line(char *line){
                     while(temp!=NULL){
                         if(temp->id<sid){
                             printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
+                            f=0;
                         }
                         temp=temp->next;
+                    }
+                    if(f){
+                        printf("error:ID NOT FOUND\n");
                     }
                 }  
             }
@@ -191,8 +207,12 @@ void process_line(char *line){
                 while(temp!=NULL){
                     if(strcmp(temp->name,token)==0){
                         printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
+                        f=0;
                     }
                     temp=temp->next;
+                }
+                if(f){
+                    printf("error:NAME NOT FOUND\n");
                 }
             }
             if(strcmp(token,"marks")==0){
@@ -201,11 +221,16 @@ void process_line(char *line){
                     token=strtok(NULL," ");
                     int m=atoi(token);
                     node* temp=head;
+                    
                     while(temp!=NULL){
-                        if(temp->id>m){
+                        if(temp->marks>m){
                             printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
+                            f=0;
                         }
                         temp=temp->next;
+                    }
+                    if(f){
+                        printf("error:ID NOT FOUND\n");
                     }
                 }
                 if(strcmp(token,"<")==0){
@@ -213,10 +238,14 @@ void process_line(char *line){
                     int m=atoi(token);
                     node* temp=head;
                     while(temp!=NULL){
-                        if(temp->id<m){
+                        if(temp->marks<m){
                             printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
+                            f=0;
                         }
                         temp=temp->next;
+                    }
+                    if(f){
+                        printf("error:ID NOT FOUND\n");
                     }
                 }
                 if(strcmp(token,"=")==0){
@@ -224,12 +253,31 @@ void process_line(char *line){
                     int m=atoi(token);
                     node* temp=head;
                     while(temp!=NULL){
-                        if(temp->id==m){
+                        if(temp->marks==m){
                             printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
+                            f=0;
                         }
                         temp=temp->next;
                     }
+                    if(f){
+                        printf("error:ID NOT FOUND\n");
+                    }
                 }                                
+            }
+            if(strcmp(token,"city")==0){
+                token=strtok(NULL," ");
+                token=strtok(NULL," ");
+                node* temp=head;
+                while(temp!=NULL){
+                    if(strcmp(temp->city,token)==0){
+                        printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
+                        f=0;
+                    }
+                    temp=temp->next;
+                }
+                if(f){
+                    printf("error:CITY NOT FOUND\n");
+                }
             }
             }
         }

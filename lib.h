@@ -12,7 +12,7 @@ node* createnode(char *name,int marks,int id,char* city);
 void insertend(char *name,int marks,int id,char* city);
 void deletebeg();
 void deletend();
-void delete(int id);
+void delete(int id,int f);
 void print();
 void process_line(char *line);
 void write(FILE* f1);
