@@ -1,3 +1,4 @@
+#define SIZE 100003
 #include "lib.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -6,6 +7,49 @@
 
 node* head=NULL;
 node* tail=NULL;
+
+map* table[SIZE]={NULL};
+
+void add(int id,node* ptr){
+    int a=id%SIZE;
+    map* new=malloc(sizeof(map));
+    new->id=id;
+    new->ptr=ptr;
+    new->next=table[a];
+    table[a]=new;
+}
+
+node* search(int id){
+    int a=id%SIZE;
+    map* temp=table[a];
+    while(temp!=NULL){
+        if(temp->id==id){
+            return temp->ptr;
+        }
+        temp=temp->next;
+    }
+    return NULL;
+}
+
+void delete_idx(int id){
+    int a=id%SIZE;
+    map* temp1=table[a];
+    map* temp2=NULL;
+    while(temp1!=NULL){
+        if(temp1->id==id){
+            if(temp2==NULL){
+                table[a]=temp1->next;
+            }
+            else{
+                temp2->next=temp1->next;
+            }
+            free(temp1);
+            return;
+        }
+        temp2=temp1;
+        temp1=temp1->next;
+    }
+}
 
 node* createnode(char *name,int marks,int id,char* city){
     node* newnode=(node*)malloc(sizeof(node));
@@ -17,15 +61,39 @@ node* createnode(char *name,int marks,int id,char* city){
     newnode->next=NULL;
     return newnode;
 }
-void insertend(char *name,int marks,int id,char* city){
+void insertsorted(char *name,int marks,int id,char* city){
     node* newnode=createnode(name,marks,id,city);
     if(head==NULL){
         head=tail=newnode;
+        add(id,newnode);
         return;
     }
-    tail->next=newnode;
-    newnode->prev=tail;
-    tail=newnode;
+    node* temp=head;
+    while(temp!=NULL){
+        if(temp->id>id){
+            if(temp==head){
+                newnode->next=head;
+                head->prev=newnode;
+                head=newnode;
+
+            }
+            else{
+                node* temp1=temp->prev;
+                temp1->next=newnode;
+                newnode->prev=temp1;
+                newnode->next=temp;
+                temp->prev=newnode;
+            }
+            break;
+        }
+        temp=temp->next;
+    }
+    if(temp==NULL){
+        tail->next=newnode;
+        newnode->prev=tail;
+        tail=newnode;
+    }
+    add(id,newnode);
 }
 void deletebeg(){
     if(head==NULL){
@@ -58,6 +126,7 @@ void deletend(){
 void delete(int id,int f){
     if(head->id==id){
         deletebeg();
+        delete_idx(id);
         return;
     }
     node* temp=head;
@@ -65,11 +134,14 @@ void delete(int id,int f){
         if(temp->id==id){
             if(temp==tail){
                 deletend();
+                delete_idx(id);
                 return;
             }
             temp->prev->next=temp->next;
             temp->next->prev=temp->prev;
+            delete_idx(id);
             free(temp);
+            f=0;
         }
         temp=temp->next;
     }
@@ -98,7 +170,7 @@ void process_line(char *line){
         token=strtok(NULL," ");
         int marks=atoi(token);
         token=strtok(NULL," ");
-        insertend(name,marks,id,token);
+        insertsorted(name,marks,id,token);
     }
     if(strstr(line,"DELETE")!=NULL){
         char* token=strtok(line," ");
@@ -110,15 +182,9 @@ void process_line(char *line){
         char* token=strtok(line," ");
         token=strtok(NULL," ");
         int id=atoi(token);
-        node* temp=head;
-        while(temp!=NULL){
-            if(temp->id==id){
-                f=0;
-                break;
-            }
-            temp=temp->next;
-        }
-        if(f){
+        node* temp;
+        temp=search(id);
+        if(!temp){
             printf("error:ID NOT FOUND\n");
             return;
         }
@@ -156,16 +222,9 @@ void process_line(char *line){
                 if(strcmp(token,"=")==0){
                     token=strtok(NULL," ");
                     int sid=atoi(token);
-                    node* temp=head;
-                    while(temp!=NULL){
-                      if(temp->id==sid){
-                        printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
-                        f=0;
-                        break;
-                      }
-                      temp=temp->next; 
-                    }
-                    if(f){
+                    node* temp=search(sid);
+                    printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);
+                    if(!temp){
                         printf("error:ID NOT FOUND\n");
                     }
                 }
@@ -187,7 +246,7 @@ void process_line(char *line){
                 if(strcmp(token,"<")==0){
                     token=strtok(NULL," ");
                     int sid=atoi(token);
-                    node* temp=head;
+                    node* temp=search(sid);
                     while(temp!=NULL){
                         if(temp->id<sid){
                             printf("%d %s %d %s\n",temp->id,temp->name,temp->marks,temp->city);

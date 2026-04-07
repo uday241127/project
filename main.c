@@ -24,7 +24,7 @@ int main(int args,char* argv[]){
     int marks;
     char city[64];
     while(fscanf(f1,"%d %s %d %s",&id,name,&marks,city)==4){
-        insertend(name,marks,id,city);
+        insertsorted(name,marks,id,city);
     }
     char line[256];
     while(fgets(line,sizeof(line),f2)!=NULL){
