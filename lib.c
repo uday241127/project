@@ -133,7 +133,7 @@ void joinname()
         }
         temp = temp->next;
     }
-    f2=1;
+    f2 = 1;
 }
 
 void joinmarks()
@@ -154,7 +154,7 @@ void joinmarks()
         }
         temp = temp->next;
     }
-    f2=1;
+    f2 = 1;
 }
 
 void add(int id, node *ptr)
@@ -214,7 +214,7 @@ node *createnode(char *name, int marks, int id, char *city)
     newnode->marks = marks;
     newnode->id = id;
     strcpy(newnode->city, city);
-    strcpy(newnode->val,"NA");
+    strcpy(newnode->val, "NA");
     newnode->prev = NULL;
     newnode->next = NULL;
     return newnode;
