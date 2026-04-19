@@ -1,4 +1,3 @@
-101 BATTER
-102 WK
-104 BOWLER
-106 ALL-ROUNDER
+Chennai TN
+Mumbai MH
+Delhi DL

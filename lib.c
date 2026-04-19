@@ -222,6 +222,10 @@ node *createnode(char *name, int marks, int id, char *city)
 
 void insertsorted(char *name, int marks, int id, char *city)
 {
+    if(search(id)!=NULL){
+        printf("error:DUPLICATE ID\n");
+        return;
+    }
     node *newnode = createnode(name, marks, id, city);
     if (head == NULL)
     {
@@ -296,14 +300,20 @@ void deletend()
     }
     free(temp);
 }
-void del(int id, int f)
+void del(int id)
 {
+    if(head==NULL){
+        printf("error:ID NOT FOUND\n");
+        return;
+    }
+    int found=0;
     if (head->id == id)
     {
         deletebeg();
         delete_idx(id);
         return;
     }
+    
     node *temp = head;
     while (temp != NULL)
     {
@@ -311,6 +321,7 @@ void del(int id, int f)
         {
             if (temp == tail)
             {
+                found=1;
                 deletend();
                 delete_idx(id);
                 return;
@@ -319,13 +330,22 @@ void del(int id, int f)
             temp->next->prev = temp->prev;
             delete_idx(id);
             free(temp);
-            f = 0;
+            return;
         }
         temp = temp->next;
     }
-    if (f)
+    if (found==0)
     {
         printf("error:ID NOT FOUND\n");
+    }
+}
+void resetval()
+{
+    node *temp = head;
+    while (temp)
+    {
+        strcpy(temp->val, "NA");
+        temp = temp->next;
     }
 }
 void print()
@@ -333,9 +353,15 @@ void print()
     node *temp = head;
     while (temp != NULL)
     {
+        if(f2==1){
         printf("%d %s %d %s %s\n", temp->id, temp->name, temp->marks, temp->city, temp->val);
+        }
+        else{
+            printf("%d %s %d %s\n",temp->id, temp->name, temp->marks, temp->city);
+        }
         temp = temp->next;
     }
+    f2=0;
 }
 
 void process_line(char *line)
@@ -360,7 +386,7 @@ void process_line(char *line)
         char *token = strtok(line, " ");
         token = strtok(NULL, " ");
         int id = atoi(token);
-        del(id, f);
+        del(id);
     }
     if (strstr(line, "UPDATE") != NULL)
     {
@@ -417,12 +443,15 @@ void process_line(char *line)
                     {
                         token = strtok(NULL, " ");
                         int sid = atoi(token);
-                        node *temp = search(sid);
-                        printf("%d %s %d %s\n", temp->id, temp->name, temp->marks, temp->city);
+                        node *temp = search(sid); 
                         if (!temp)
                         {
                             printf("error:ID NOT FOUND\n");
                         }
+                        else{
+                        printf("%d %s %d %s\n", temp->id, temp->name, temp->marks, temp->city);
+                        }
+                       
                     }
                     if (strcmp(token, ">") == 0)
                     {
@@ -570,19 +599,27 @@ void process_line(char *line)
 
                 if (strcmp(token, "CITY") == 0)
                 {
+                    resetval();
                     joincity();
+                    print();
                 }
                 if (strcmp(token, "ID") == 0)
                 {
+                    resetval();
                     joinid();
+                    print();
                 }
                 if (strcmp(token, "MARKS") == 0)
                 {
+                    resetval();
                     joinmarks();
+                    print();
                 }
                 if (strcmp(token, "NAME") == 0)
                 {
+                    resetval();
                     joinname();
+                    print();
                 }
             }
         }
@@ -603,4 +640,5 @@ void out(FILE *f1)
         }
         temp = temp->next;
     }
+    f2=0;
 }

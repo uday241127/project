@@ -1,6 +1,1 @@
-101 John 85 Chennai BATTER
-102 Alice 90 Mumbai WK
-103 Bob 70 Delhi NA
-104 UDAY 89 HYD BOWLER
-105 Dave 40 Kolkata NA
-106 Eve 95 Mumbai ALL-ROUNDER
+1 A 10 Unknown
