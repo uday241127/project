@@ -159,7 +159,7 @@ void joinmarks()
 
 void add(int id, node *ptr)
 {
-    int a = id % SIZE;
+    int a = (id % SIZE + SIZE) % SIZE;
     map *new = malloc(sizeof(map));
     new->id = id;
     new->ptr = ptr;
@@ -169,7 +169,7 @@ void add(int id, node *ptr)
 
 node *search(int id)
 {
-    int a = id % SIZE;
+    int a = (id % SIZE + SIZE) % SIZE;
     map *temp = table[a];
     while (temp != NULL)
     {
@@ -184,7 +184,7 @@ node *search(int id)
 
 void delete_idx(int id)
 {
-    int a = id % SIZE;
+    int a = (id % SIZE + SIZE) % SIZE;
     map *temp1 = table[a];
     map *temp2 = NULL;
     while (temp1 != NULL)
@@ -222,7 +222,8 @@ node *createnode(char *name, int marks, int id, char *city)
 
 void insertsorted(char *name, int marks, int id, char *city)
 {
-    if(search(id)!=NULL){
+    if (search(id) != NULL)
+    {
         printf("error:DUPLICATE ID\n");
         return;
     }
@@ -271,6 +272,7 @@ void deletebeg()
         return;
     }
     node *temp = head;
+    delete_idx(temp->id);
     if (head == tail)
     {
         head = tail = NULL;
@@ -289,6 +291,7 @@ void deletend()
         return;
     }
     node *temp = tail;
+    delete_idx(temp->id);
     if (head == tail)
     {
         head = tail = NULL;
@@ -302,18 +305,18 @@ void deletend()
 }
 void del(int id)
 {
-    if(head==NULL){
+    if (head == NULL)
+    {
         printf("error:ID NOT FOUND\n");
         return;
     }
-    int found=0;
+    int found = 0;
     if (head->id == id)
     {
         deletebeg();
-        delete_idx(id);
         return;
     }
-    
+
     node *temp = head;
     while (temp != NULL)
     {
@@ -321,9 +324,8 @@ void del(int id)
         {
             if (temp == tail)
             {
-                found=1;
+                found = 1;
                 deletend();
-                delete_idx(id);
                 return;
             }
             temp->prev->next = temp->next;
@@ -334,7 +336,7 @@ void del(int id)
         }
         temp = temp->next;
     }
-    if (found==0)
+    if (found == 0)
     {
         printf("error:ID NOT FOUND\n");
     }
@@ -350,25 +352,123 @@ void resetval()
 }
 void print()
 {
+    if (head == NULL)
+    {
+        f2 = 0;
+        return;
+    }
     node *temp = head;
     while (temp != NULL)
     {
-        if(f2==1){
-        printf("%d %s %d %s %s\n", temp->id, temp->name, temp->marks, temp->city, temp->val);
+        if (f2 == 1)
+        {
+            printf("%d %s %d %s %s\n", temp->id, temp->name, temp->marks, temp->city, temp->val);
         }
-        else{
-            printf("%d %s %d %s\n",temp->id, temp->name, temp->marks, temp->city);
+        else
+        {
+            printf("%d %s %d %s\n", temp->id, temp->name, temp->marks, temp->city);
         }
         temp = temp->next;
     }
-    f2=0;
+    f2 = 0;
 }
 
+void deleteall()
+{
+    node *temp = head;
+    while (temp)
+    {
+        node *next = temp->next;
+        free(temp);
+        temp = next;
+    }
+
+    head = tail = NULL;
+    for (int i = 0; i < SIZE; i++)
+    {
+        map *curr = table[i];
+        while (curr)
+        {
+            map *next = curr->next;
+            free(curr);
+            curr = next;
+        }
+        table[i] = NULL;
+    }
+    for (int i = 0; i < SIZE; i++)
+    {
+        map2 *curr = table2[i];
+        while (curr)
+        {
+            map2 *next = curr->next;
+            free(curr);
+            curr = next;
+        }
+        table2[i] = NULL;
+    }
+    node2 *temp2 = head2;
+    while (temp2)
+    {
+        node2 *next = temp2->next;
+        free(temp2);
+        temp2 = next;
+    }
+    head2 = tail2 = NULL;
+    memset(table, 0, sizeof(table));
+    memset(table2, 0, sizeof(table2));
+    f2 = 0;
+}
+
+void count()
+{
+    int count = 0;
+    node *temp = head;
+    while (temp)
+    {
+        count++;
+        temp = temp->next;
+    }
+    printf("NO. OF RECORDS = %d\n", count);
+}
+
+void max()
+{
+    int max = 0;
+    node *temp = head;
+    while (temp)
+    {
+        if (temp->marks > max)
+        {
+            max = temp->marks;
+        }
+        temp = temp->next;
+    }
+    printf("MAX MARKS = %d\n", max);
+}
+
+void min()
+{
+    int min = 0;
+    node *temp = head;
+    while (temp)
+    {
+        if (temp->marks < min)
+        {
+            min = temp->marks;
+        }
+        temp = temp->next;
+    }
+    printf("MIN MARKS = %d\n", min);
+}
 void process_line(char *line)
 {
     line[strcspn(line, "\n")] = '\0';
     int f = 1;
-    if (strstr(line, "INSERT") != NULL)
+    if (head == NULL)
+    {
+        f2 = 0;
+    }
+    if (strncmp(line, "INSERT", 6) == 0)
     {
         char *token = strtok(line, " ");
         token = strtok(NULL, " ");
@@ -381,14 +481,22 @@ void process_line(char *line)
         token = strtok(NULL, " ");
         insertsorted(name, marks, id, token);
     }
-    if (strstr(line, "DELETE") != NULL)
+    else if (strncmp(line, "DELETE", 6) == 0)
     {
         char *token = strtok(line, " ");
         token = strtok(NULL, " ");
-        int id = atoi(token);
-        del(id);
+        if (strcmp(token, "ALL") == 0)
+        {
+            deleteall();
+            return;
+        }
+        else
+        {
+            int id = atoi(token);
+            del(id);
+        }
     }
-    if (strstr(line, "UPDATE") != NULL)
+    else if (strncmp(line, "UPDATE", 6) == 0)
     {
         char *token = strtok(line, " ");
         token = strtok(NULL, " ");
@@ -420,7 +528,7 @@ void process_line(char *line)
             strcpy(temp->city, token);
         }
     }
-    if (strstr(line, "SELECT") != NULL)
+    else if (strncmp(line, "SELECT", 6) == 0)
     {
         char *token = strtok(line, " ");
         token = strtok(NULL, " ");
@@ -443,15 +551,15 @@ void process_line(char *line)
                     {
                         token = strtok(NULL, " ");
                         int sid = atoi(token);
-                        node *temp = search(sid); 
+                        node *temp = search(sid);
                         if (!temp)
                         {
                             printf("error:ID NOT FOUND\n");
                         }
-                        else{
-                        printf("%d %s %d %s\n", temp->id, temp->name, temp->marks, temp->city);
+                        else
+                        {
+                            printf("%d %s %d %s\n", temp->id, temp->name, temp->marks, temp->city);
                         }
-                       
                     }
                     if (strcmp(token, ">") == 0)
                     {
@@ -623,6 +731,18 @@ void process_line(char *line)
                 }
             }
         }
+        if (strcmp(token, "COUNT") == 0)
+        {
+            count();
+        }
+        if (strcmp(token, "MAX") == 0)
+        {
+            max();
+        }
+        if (strcmp(token, "MIN") == 0)
+        {
+            min();
+        }
     }
 }
 void out(FILE *f1)
@@ -640,5 +760,5 @@ void out(FILE *f1)
         }
         temp = temp->next;
     }
-    f2=0;
+    f2 = 0;
 }

@@ -49,3 +49,7 @@ void joinid();
 void joinmarks();
 void joinname();
 void resetval();
+void deleteall();
+void count();
+void max();
+void min();
