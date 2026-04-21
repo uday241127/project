@@ -433,8 +433,17 @@ void count()
 
 void max()
 {
-    int max = 0;
+    int max;
     node *temp = head;
+    if (head != NULL)
+    {
+        max = head->marks;
+    }
+    else
+    {
+        printf("NO RECORDS AVAILABLE\n");
+        return;
+    }
     while (temp)
     {
         if (temp->marks > max)
@@ -448,8 +457,17 @@ void max()
 
 void min()
 {
-    int min = 0;
+    int min;
     node *temp = head;
+    if (head != NULL)
+    {
+        min = head->marks;
+    }
+    else
+    {
+        printf("NO RECORDS AVAILABLE\n");
+        return;
+    }
     while (temp)
     {
         if (temp->marks < min)
@@ -472,6 +490,11 @@ void avg()
         c++;
         temp = temp->next;
     }
+    if (c == 0)
+    {
+        printf("AVG MARKS = 0.00\n");
+        return;
+    }
     printf("AVG MARKS = %.2f\n", (double)s / c);
 }
 void process_line(char *line)
@@ -484,21 +507,53 @@ void process_line(char *line)
     }
     if (strncmp(line, "INSERT", 6) == 0)
     {
-        char *token = strtok(line, " ");
-        token = strtok(NULL, " ");
+        char *token = strtok(line, " \t");
+        token = strtok(NULL, " \t");
+        if (token == NULL)
+        {
+            printf("INVALID QUERY\n");
+            return;
+        }
         int id = atoi(token);
-        token = strtok(NULL, " ");
+        token = strtok(NULL, " \t");
+        if (token == NULL)
+        {
+            printf("INVALID QUERY\n");
+            return;
+        }
         char name[64];
         strcpy(name, token);
-        token = strtok(NULL, " ");
+        token = strtok(NULL, " \t");
+        if (token == NULL)
+        {
+            printf("INVALID QUERY\n");
+            return;
+        }
         int marks = atoi(token);
-        token = strtok(NULL, " ");
+        token = strtok(NULL, " \t");
+        if (token == NULL)
+        {
+            printf("INVALID QUERY\n");
+            return;
+        }
+        char *extra = strtok(NULL, " \t\n");
+        if (extra != NULL)
+        {
+            printf("INVALID QUERY\n");
+            return;
+        }
         insertsorted(name, marks, id, token);
     }
     else if (strncmp(line, "DELETE", 6) == 0)
     {
-        char *token = strtok(line, " ");
-        token = strtok(NULL, " ");
+        char *token = strtok(line, " \t");
+        token = strtok(NULL, " \t");
+        if (token == NULL)
+        {
+            printf("INVALID QUERY\n");
+            return;
+        }
+
         if (strcmp(token, "ALL") == 0)
         {
             deleteall();
@@ -509,11 +564,22 @@ void process_line(char *line)
             int id = atoi(token);
             del(id);
         }
+        char *extra = strtok(NULL, " \t\n");
+        if (extra != NULL)
+        {
+            printf("INVALID QUERY\n");
+            return;
+        }
     }
     else if (strncmp(line, "UPDATE", 6) == 0)
     {
-        char *token = strtok(line, " ");
-        token = strtok(NULL, " ");
+        char *token = strtok(line, " \t");
+        token = strtok(NULL, " \t");
+        if (token == NULL)
+        {
+            printf("INVALID QUERY\n");
+            return;
+        }
         int id = atoi(token);
         node *temp;
         temp = search(id);
@@ -522,34 +588,69 @@ void process_line(char *line)
             printf("error:ID NOT FOUND\n");
             return;
         }
-        token = strtok(NULL, " ");
+        token = strtok(NULL, " \t");
+        if (token == NULL)
+        {
+            printf("INVALID QUERY\n");
+            return;
+        }
         char op[10];
         strcpy(op, token);
         if (strcmp(op, "NAME") == 0)
         {
-            token = strtok(NULL, " ");
+            token = strtok(NULL, " \t");
+            if (token == NULL)
+            {
+                printf("INVALID QUERY\n");
+                return;
+            }
             strcpy(temp->name, token);
         }
-        if (strcmp(op, "MARKS") == 0)
+        else if (strcmp(op, "MARKS") == 0)
         {
-            token = strtok(NULL, " ");
+            token = strtok(NULL, " \t");
+            if (token == NULL)
+            {
+                printf("INVALID QUERY\n");
+                return;
+            }
             int nm = atoi(token);
             temp->marks = nm;
         }
-        if (strcmp(op, "CITY") == 0)
+        else if (strcmp(op, "CITY") == 0)
         {
-            token = strtok(NULL, " ");
+            token = strtok(NULL, " \t");
+            if (token == NULL)
+            {
+                printf("INVALID QUERY\n");
+                return;
+            }
             strcpy(temp->city, token);
+        }
+        else
+        {
+            printf("INVALID FIELD\n");
+            return;
+        }
+        char *extra = strtok(NULL, " \t\n");
+        if (extra != NULL)
+        {
+            printf("INVALID QUERY\n");
+            return;
         }
     }
     else if (strncmp(line, "SELECT", 6) == 0)
     {
-        char *token = strtok(line, " ");
-        token = strtok(NULL, " ");
-
+        char *token = strtok(line, " \t");
+        token = strtok(NULL, " \t");
+        if (token == NULL)
+        {
+            printf("INVALID QUERY\n");
+            return;
+        }
         if (strcmp(token, "*") == 0)
         {
-            token = strtok(NULL, " ");
+            token = strtok(NULL, " \t");
             if (token == NULL)
             {
                 print();
@@ -557,13 +658,28 @@ void process_line(char *line)
             }
             if (strcmp(token, "WHERE") == 0)
             {
-                token = strtok(NULL, " ");
+                token = strtok(NULL, " \t");
+                if (token == NULL)
+                {
+                    printf("INVALID QUERY\n");
+                    return;
+                }
                 if (strcmp(token, "id") == 0)
                 {
-                    token = strtok(NULL, " ");
+                    token = strtok(NULL, " \t");
+                    if (token == NULL)
+                    {
+                        printf("INVALID QUERY\n");
+                        return;
+                    }
                     if (strcmp(token, "=") == 0)
                     {
-                        token = strtok(NULL, " ");
+                        token = strtok(NULL, " \t");
+                        if (token == NULL)
+                        {
+                            printf("INVALID QUERY\n");
+                            return;
+                        }
                         int sid = atoi(token);
                         node *temp = search(sid);
                         if (!temp)
@@ -577,7 +693,12 @@ void process_line(char *line)
                     }
                     if (strcmp(token, ">") == 0)
                     {
-                        token = strtok(NULL, " ");
+                        token = strtok(NULL, " \t");
+                        if (token == NULL)
+                        {
+                            printf("INVALID QUERY\n");
+                            return;
+                        }
                         int sid = atoi(token);
                         node *temp = head;
                         while (temp != NULL)
@@ -596,7 +717,12 @@ void process_line(char *line)
                     }
                     if (strcmp(token, "<") == 0)
                     {
-                        token = strtok(NULL, " ");
+                        token = strtok(NULL, " \t");
+                        if (token == NULL)
+                        {
+                            printf("INVALID QUERY\n");
+                            return;
+                        }
                         int sid = atoi(token);
                         node *temp = head;
                         while (temp != NULL)
@@ -616,8 +742,18 @@ void process_line(char *line)
                 }
                 if (strcmp(token, "name") == 0)
                 {
-                    token = strtok(NULL, " ");
-                    token = strtok(NULL, " ");
+                    token = strtok(NULL, " \t");
+                    if (token == NULL)
+                    {
+                        printf("INVALID QUERY\n");
+                        return;
+                    }
+                    token = strtok(NULL, " \t");
+                    if (token == NULL)
+                    {
+                        printf("INVALID QUERY\n");
+                        return;
+                    }
                     node *temp = head;
                     while (temp != NULL)
                     {
@@ -632,13 +768,29 @@ void process_line(char *line)
                     {
                         printf("error:NAME NOT FOUND\n");
                     }
+                    char *extra = strtok(NULL, " \t\n");
+                    if (extra != NULL)
+                    {
+                        printf("INVALID QUERY\n");
+                        return;
+                    }
                 }
                 if (strcmp(token, "marks") == 0)
                 {
-                    token = strtok(NULL, " ");
+                    token = strtok(NULL, " \t");
+                    if (token == NULL)
+                    {
+                        printf("INVALID QUERY\n");
+                        return;
+                    }
                     if (strcmp(token, ">") == 0)
                     {
-                        token = strtok(NULL, " ");
+                        token = strtok(NULL, " \t");
+                        if (token == NULL)
+                        {
+                            printf("INVALID QUERY\n");
+                            return;
+                        }
                         int m = atoi(token);
                         node *temp = head;
 
@@ -653,12 +805,17 @@ void process_line(char *line)
                         }
                         if (f)
                         {
-                            printf("error:ID NOT FOUND\n");
+                            printf("error:MARKS NOT FOUND\n");
                         }
                     }
                     if (strcmp(token, "<") == 0)
                     {
-                        token = strtok(NULL, " ");
+                        token = strtok(NULL, " \t");
+                        if (token == NULL)
+                        {
+                            printf("INVALID QUERY\n");
+                            return;
+                        }
                         int m = atoi(token);
                         node *temp = head;
                         while (temp != NULL)
@@ -672,12 +829,17 @@ void process_line(char *line)
                         }
                         if (f)
                         {
-                            printf("error:ID NOT FOUND\n");
+                            printf("error:MARKS NOT FOUND\n");
                         }
                     }
                     if (strcmp(token, "=") == 0)
                     {
-                        token = strtok(NULL, " ");
+                        token = strtok(NULL, " \t");
+                        if (token == NULL)
+                        {
+                            printf("INVALID QUERY\n");
+                            return;
+                        }
                         int m = atoi(token);
                         node *temp = head;
                         while (temp != NULL)
@@ -691,14 +853,30 @@ void process_line(char *line)
                         }
                         if (f)
                         {
-                            printf("error:ID NOT FOUND\n");
+                            printf("error:MARKS NOT FOUND\n");
                         }
+                    }
+                    char *extra = strtok(NULL, " \t\n");
+                    if (extra != NULL)
+                    {
+                        printf("INVALID QUERY\n");
+                        return;
                     }
                 }
                 if (strcmp(token, "city") == 0)
                 {
-                    token = strtok(NULL, " ");
-                    token = strtok(NULL, " ");
+                    token = strtok(NULL, " \t");
+                    if (token == NULL)
+                    {
+                        printf("INVALID QUERY\n");
+                        return;
+                    }
+                    token = strtok(NULL, " \t");
+                    if (token == NULL)
+                    {
+                        printf("INVALID QUERY\n");
+                        return;
+                    }
                     node *temp = head;
                     while (temp != NULL)
                     {
@@ -713,12 +891,27 @@ void process_line(char *line)
                     {
                         printf("error:CITY NOT FOUND\n");
                     }
+                    char *extra = strtok(NULL, " \t\n");
+                    if (extra != NULL)
+                    {
+                        printf("INVALID QUERY\n");
+                        return;
+                    }
                 }
             }
             if (strcmp(token, "JOIN") == 0)
             {
-                token = strtok(NULL, " ");
-
+                if (head2 == NULL)
+                {
+                    printf("NO JOIN DATA\n");
+                    return;
+                }
+                token = strtok(NULL, " \t");
+                if (token == NULL)
+                {
+                    printf("INVALID QUERY\n");
+                    return;
+                }
                 if (strcmp(token, "CITY") == 0)
                 {
                     resetval();
@@ -743,6 +936,12 @@ void process_line(char *line)
                     joinname();
                     print();
                 }
+                char *extra = strtok(NULL, " \t\n");
+                if (extra != NULL)
+                {
+                    printf("INVALID QUERY\n");
+                    return;
+                }
             }
         }
         if (strcmp(token, "COUNT") == 0)
@@ -760,6 +959,12 @@ void process_line(char *line)
         if (strcmp(token, "AVG") == 0)
         {
             avg();
+        }
+        char *extra = strtok(NULL, " \t\n");
+        if (extra != NULL)
+        {
+            printf("INVALID QUERY\n");
+            return;
         }
     }
 }
@@ -781,9 +986,11 @@ void out(FILE *f1)
     f2 = 0;
 }
 
-void free_list() {
+void free_list()
+{
     node *temp = head;
-    while (temp != NULL) {
+    while (temp != NULL)
+    {
         node *next = temp->next;
         free(temp);
         temp = next;
@@ -792,10 +999,13 @@ void free_list() {
     tail = NULL;
 }
 
-void free_hash() {
-    for (int i = 0; i < SIZE; i++) {
+void free_hash()
+{
+    for (int i = 0; i < SIZE; i++)
+    {
         map *temp = table[i];
-        while (temp != NULL) {
+        while (temp != NULL)
+        {
             map *next = temp->next;
             free(temp);
             temp = next;
@@ -804,9 +1014,11 @@ void free_hash() {
     }
 }
 
-void free_list2() {
+void free_list2()
+{
     node2 *temp = head2;
-    while (temp != NULL) {
+    while (temp != NULL)
+    {
         node2 *next = temp->next;
         free(temp);
         temp = next;
@@ -815,10 +1027,13 @@ void free_list2() {
     tail2 = NULL;
 }
 
-void free_hash2() {
-    for (int i = 0; i < SIZE; i++) {
+void free_hash2()
+{
+    for (int i = 0; i < SIZE; i++)
+    {
         map2 *temp = table2[i];
-        while (temp != NULL) {
+        while (temp != NULL)
+        {
             map2 *next = temp->next;
             free(temp);
             temp = next;
@@ -827,7 +1042,8 @@ void free_hash2() {
     }
 }
 
-void clean() {
+void clean()
+{
     free_list();
     free_hash();
     free_list2();
