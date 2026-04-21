@@ -61,4 +61,6 @@ int main(int args, char *argv[])
     f4 = fopen("output.txt", "w");
     out(f4);
     fclose(f3);
+
+    clean();
 }

@@ -460,6 +460,20 @@ void min()
     }
     printf("MIN MARKS = %d\n", min);
 }
+
+void avg()
+{
+    int s = 0;
+    int c = 0;
+    node *temp = head;
+    while (temp)
+    {
+        s = s + temp->marks;
+        c++;
+        temp = temp->next;
+    }
+    printf("AVG MARKS = %.2f\n", (double)s / c);
+}
 void process_line(char *line)
 {
     line[strcspn(line, "\n")] = '\0';
@@ -743,6 +757,10 @@ void process_line(char *line)
         {
             min();
         }
+        if (strcmp(token, "AVG") == 0)
+        {
+            avg();
+        }
     }
 }
 void out(FILE *f1)
@@ -761,4 +779,57 @@ void out(FILE *f1)
         temp = temp->next;
     }
     f2 = 0;
+}
+
+void free_list() {
+    node *temp = head;
+    while (temp != NULL) {
+        node *next = temp->next;
+        free(temp);
+        temp = next;
+    }
+    head = NULL;
+    tail = NULL;
+}
+
+void free_hash() {
+    for (int i = 0; i < SIZE; i++) {
+        map *temp = table[i];
+        while (temp != NULL) {
+            map *next = temp->next;
+            free(temp);
+            temp = next;
+        }
+        table[i] = NULL;
+    }
+}
+
+void free_list2() {
+    node2 *temp = head2;
+    while (temp != NULL) {
+        node2 *next = temp->next;
+        free(temp);
+        temp = next;
+    }
+    head2 = NULL;
+    tail2 = NULL;
+}
+
+void free_hash2() {
+    for (int i = 0; i < SIZE; i++) {
+        map2 *temp = table2[i];
+        while (temp != NULL) {
+            map2 *next = temp->next;
+            free(temp);
+            temp = next;
+        }
+        table2[i] = NULL;
+    }
+}
+
+void clean() {
+    free_list();
+    free_hash();
+    free_list2();
+    free_hash2();
 }
